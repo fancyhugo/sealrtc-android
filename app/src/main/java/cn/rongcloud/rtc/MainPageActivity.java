@@ -70,6 +70,9 @@ import cn.rongcloud.rtc.room.RongRTCRoom;
 import cn.rongcloud.rtc.stream.local.RongRTCCapture;
 import cn.rongcloud.rtc.util.SessionManager;
 import cn.rongcloud.rtc.util.Utils;
+import io.rong.callkit.RongCallKit;
+import io.rong.imkit.RongIM;
+import io.rong.imkit.manager.InternalModuleManager;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.common.DeviceUtils;
 
@@ -166,6 +169,7 @@ public class MainPageActivity extends RongRTCBaseActivity implements View.OnClic
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+        InternalModuleManager.getInstance().onLoaded();
     }
 
     private void initViews() {
@@ -282,6 +286,7 @@ public class MainPageActivity extends RongRTCBaseActivity implements View.OnClic
 //        initSDK();        // imInit 多次。会造成im中extension添加多次
         mLiveView = findViewById(R.id.live_button);
         mLiveView.setOnClickListener(this);
+        findViewById(R.id.callKit).setOnClickListener(this);
         RongIMClient.setConnectionStatusListener(new RongIMClient.ConnectionStatusListener() {
             @Override
             public void onChanged(ConnectionStatus connectionStatus) {
@@ -309,9 +314,18 @@ public class MainPageActivity extends RongRTCBaseActivity implements View.OnClic
 
     private String cerUrl = null;
 
+    private void startCallKitCall() {
+        //sealrtc 缺少好友关系模块，这个id是预先写死的测试id
+        String presetUserId = "";
+        RongCallKit.startSingleCall(this, presetUserId, RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.callKit:
+                startCallKitCall();
+                 break;
             case R.id.connect_settings:
                 startSetting();
                 break;
@@ -1089,8 +1103,8 @@ public class MainPageActivity extends RongRTCBaseActivity implements View.OnClic
              * 如果是连接到私有云需要在此配置服务器地址
              * 如果是公有云则不需要调用此方法
              */
-            RongIMClient.setServerInfo(ServerUtils.getNavServer(), UserUtils.FILE_SERVER);
-            RongIMClient.init(getApplication(), ServerUtils.getAppKey(), false);
+            RongIM.setServerInfo(ServerUtils.getNavServer(), UserUtils.FILE_SERVER);
+            RongIM.init(getApplication(), ServerUtils.getAppKey(), false);
             /*
              * 设置建立 Https 连接时，是否使用自签证书。
              * 公有云用户无需调用此方法，私有云用户使用自签证书时调用此方法设置

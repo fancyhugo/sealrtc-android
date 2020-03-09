@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rongcloud.rtc.CenterManager;
 import cn.rongcloud.rtc.utils.FinLog;
 import io.rong.callkit.util.ActivityStartCheckUtils;
 import io.rong.calllib.IRongReceivedCallListener;
@@ -184,6 +185,11 @@ public class RongCallModule implements IExternalModule {
      *                                 其它情况下设置为false。
      */
     private void startVoIPActivity(Context context, final RongCallSession callSession, boolean startForCheckPermissions) {
+        //如果在音视频会议中，来电直接挂断，不往上通知用户
+        if (CenterManager.getInstance().isInRoom()) {
+            RongCallClient.getInstance().hangUpCall();
+            return;
+        }
         FinLog.d("VoIPReceiver", "startVoIPActivity");
         //        // 在 Android 10 以上版本不再允许后台运行 Activity
         if (Build.VERSION.SDK_INT < 29 || isAppOnForeground(context)) {
