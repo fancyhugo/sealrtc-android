@@ -1,0 +1,11 @@
+.DS_Store
+.gradle/
+.idea/
+gradlew.bat
+local.properties
+tags
+*.iml
+**/build/
+*.pyc
+.project
+*.class
